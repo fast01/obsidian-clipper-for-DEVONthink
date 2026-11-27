@@ -239,6 +239,7 @@ export class Reader {
 		const clipHighlightsBtn = doc.createElement('button');
 		clipHighlightsBtn.className = 'obsidian-reader-settings-trigger nav-btn';
 		clipHighlightsBtn.setAttribute('aria-label', getMessage('clipHighlights'));
+		clipHighlightsBtn.setAttribute('title', getMessage('clipHighlights'));
 		clipHighlightsBtn.appendChild(this.createSVG({
 			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
 			paths: ['M4 4h6', 'M4 4v6', 'M20 20h-6', 'M20 20v-6', 'm14 4 6 6', 'm10 20-6-6'],
