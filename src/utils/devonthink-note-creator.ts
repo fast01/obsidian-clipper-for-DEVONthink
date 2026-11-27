@@ -32,6 +32,18 @@ function openExternalUrl(url: string): void {
 
 export type DevonThinkFormat = 'markdown' | 'html';
 
+// DEVONthink renders HTML previews using its own appearance theme. When the
+// app is in dark mode, a bare HTML fragment (with the source page's dark
+// text colors) becomes unreadable black-on-black. Wrap the fragment in a
+// light, full-width surface so it stays legible regardless of DT's theme.
+// Kept as a fragment (no <!DOCTYPE>/<html>) because that is the form verified
+// to work with createHTML + location in DT 4.4.2.
+function wrapHtmlForDevonThink(html: string): string {
+	return `<div style="background:#ffffff!important;color:#1a1a1a!important;padding:16px;` +
+		`font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;` +
+		`min-height:100%">${html}</div>`;
+}
+
 export async function saveToDevonThink(
 	fileContent: string,
 	noteName: string,
@@ -50,7 +62,7 @@ export async function saveToDevonThink(
 		// (without it the command is a silent no-op), but when both are given,
 		// `source` content is preserved and `location` only supplies the URL
 		// metadata — it does NOT re-download the page (unlike createMarkdown).
-		parts.push(urlParam('source', fileContent));
+		parts.push(urlParam('source', wrapHtmlForDevonThink(fileContent)));
 		if (location) parts.push(urlParam('location', location));
 	} else {
 		// Markdown mode: never pass `location` — createMarkdown treats it as a

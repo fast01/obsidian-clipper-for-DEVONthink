@@ -6,9 +6,9 @@ An enhanced Web Clipper that clips web pages **directly into DEVONthink** as Mar
 
 ## 📦 Download
 
-**[⬇️ Download the latest extension ZIP](https://github.com/fast01/obsidian-clipper-for-DEVONthink/releases/latest/download/obsidian-web-clipper-1.8.5-chrome.zip)** — ~4.4 MB, points to the newest release. ([All releases](https://github.com/fast01/obsidian-clipper-for-DEVONthink/releases))
+**[⬇️ Download the latest extension ZIP](https://github.com/fast01/obsidian-clipper-for-DEVONthink/releases/latest/download/obsidian-web-clipper-for-devonthink-1.8.5-chrome.zip)** — ~4.4 MB, points to the newest release. ([All releases](https://github.com/fast01/obsidian-clipper-for-DEVONthink/releases))
 
-> To keep the link working across updates, future releases should reuse the same asset filename `obsidian-web-clipper-1.8.5-chrome.zip`. If a release renames it, update this link too.
+> To keep the link working across updates, future releases should reuse the same asset filename `obsidian-web-clipper-for-devonthink-1.8.5-chrome.zip`. If a release renames it, update this link too.
 
 ![Clip a page into DEVONthink](obsidian-webclipper-for-DEVONthink.png)
 
