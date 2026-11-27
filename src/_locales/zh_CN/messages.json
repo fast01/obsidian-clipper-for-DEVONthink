@@ -17,8 +17,26 @@
 	"addProviderTitle": {
 		"message": "添加提供商"
 	},
+	"addToDevonThink": {
+		"message": "剪切到 DEVONthink"
+	},
 	"addToObsidian": {
 		"message": "添加到 Obsidian"
+	},
+	"devonthinkDestinationDescription": {
+		"message": "可选。在 DEVONthink 中复制数据库或分组的链接，把其中的 UUID 填到这里。留空则每次剪切时手动选择目标。"
+	},
+	"devonthinkDestinationLabel": {
+		"message": "DEVONthink 目标 UUID"
+	},
+	"devonthinkTagsDescription": {
+		"message": "可选。用英文逗号分隔，会添加到剪切生成的文档中。"
+	},
+	"devonthinkTagsLabel": {
+		"message": "DEVONthink 标签"
+	},
+	"devonthinkTooLong": {
+		"message": "剪切内容过长，超过 DEVONthink URL 命令的限制。请减少选择范围后重试。"
 	},
 	"addVaultPlaceholder": {
 		"message": "按回车键添加保管库"

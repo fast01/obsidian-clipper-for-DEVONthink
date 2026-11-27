@@ -227,6 +227,7 @@ export function initializeGeneralSettings(): void {
 		initializeHighlighterSettings();
 		initializeExportHighlightsButton();
 		initializeSaveBehaviorDropdown();
+		initializeDevonThinkSettings();
 		await initializeUsageChart();
 
 		// Initialize feedback modal close button
@@ -367,9 +368,27 @@ function initializeSaveBehaviorDropdown(): void {
 
     dropdown.value = generalSettings.saveBehavior;
     dropdown.addEventListener('change', () => {
-        const newValue = dropdown.value as 'addToObsidian' | 'copyToClipboard' | 'saveFile';
+        const newValue = dropdown.value as Settings['saveBehavior'];
         saveSettings({ saveBehavior: newValue });
     });
+}
+
+function initializeDevonThinkSettings(): void {
+	const destinationInput = document.getElementById('devonthink-destination-input') as HTMLInputElement;
+	const tagsInput = document.getElementById('devonthink-tags-input') as HTMLInputElement;
+
+	if (destinationInput) {
+		destinationInput.value = generalSettings.devonthinkDestination || '';
+		destinationInput.addEventListener('change', () => {
+			saveSettings({ devonthinkDestination: destinationInput.value.trim() });
+		});
+	}
+	if (tagsInput) {
+		tagsInput.value = generalSettings.devonthinkTags || '';
+		tagsInput.addEventListener('change', () => {
+			saveSettings({ devonthinkTags: tagsInput.value.trim() });
+		});
+	}
 }
 
 export function resetDefaultTemplate(): void {

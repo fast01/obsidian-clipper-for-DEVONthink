@@ -48,7 +48,7 @@ export interface Rating {
 	date: string;
 }
 
-export type SaveBehavior = 'addToObsidian' | 'saveFile' | 'copyToClipboard';
+export type SaveBehavior = 'addToObsidian' | 'addToDevonThink' | 'saveFile' | 'copyToClipboard';
 
 export interface ReaderSettings {
 	fontSize: number;
@@ -88,6 +88,7 @@ export interface Settings {
 	readerSettings: ReaderSettings;
 	stats: {
 		addToObsidian: number;
+		addToDevonThink: number;
 		saveFile: number;
 		copyToClipboard: number;
 		share: number;
@@ -95,7 +96,9 @@ export interface Settings {
 	};
 	history: HistoryEntry[];
 	ratings: Rating[];
-	saveBehavior: 'addToObsidian' | 'saveFile' | 'copyToClipboard';
+	saveBehavior: SaveBehavior;
+	devonthinkDestination: string;
+	devonthinkTags: string;
 }
 
 export interface ModelConfig {
@@ -109,7 +112,7 @@ export interface ModelConfig {
 export interface HistoryEntry {
 	datetime: string;
 	url: string;
-	action: 'addToObsidian' | 'saveFile' | 'copyToClipboard' | 'share' | 'readerMode';
+	action: 'addToObsidian' | 'addToDevonThink' | 'saveFile' | 'copyToClipboard' | 'share' | 'readerMode';
 	title?: string;
 	vault?: string;
 	path?: string;

@@ -159,10 +159,33 @@
 										</div>
 										<div class="setting-item-control">
 											<select id="save-behavior-dropdown">
-												<option value="addToObsidian" selected data-i18n="addToObsidian">Add to Obsidian</option>
+												<option value="addToObsidian" data-i18n="addToObsidian">Add to Obsidian</option>
+												<option value="addToDevonThink" selected data-i18n="addToDevonThink">Clip to DEVONthink</option>
 												<option value="copyToClipboard" data-i18n="copyToClipboard">Copy to clipboard</option>
 												<option value="saveFile" data-i18n="saveFile">Save file</option>
 											</select>
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="devonthink-destination-input" data-i18n="devonthinkDestinationLabel">DEVONthink destination UUID</label>
+											<div class="setting-item-description" data-i18n="devonthinkDestinationDescription">
+												Optional. Copy the database or group link in DEVONthink and paste its UUID here. Leave empty to choose the destination each time.
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<input type="text" id="devonthink-destination-input" placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" />
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="devonthink-tags-input" data-i18n="devonthinkTagsLabel">DEVONthink tags</label>
+											<div class="setting-item-description" data-i18n="devonthinkTagsDescription">
+												Optional. Comma-separated tags added to clipped documents.
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<input type="text" id="devonthink-tags-input" placeholder="web, clip" />
 										</div>
 									</div>
 									<div class="setting-item mod-horizontal">

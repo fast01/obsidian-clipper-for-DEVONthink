@@ -40,6 +40,7 @@ export let generalSettings: Settings = {
 	},
 	stats: {
 		addToObsidian: 0,
+		addToDevonThink: 0,
 		saveFile: 0,
 		copyToClipboard: 0,
 		share: 0,
@@ -47,7 +48,9 @@ export let generalSettings: Settings = {
 	},
 	history: [],
 	ratings: [],
-	saveBehavior: 'addToObsidian'
+	saveBehavior: 'addToDevonThink',
+	devonthinkDestination: '',
+	devonthinkTags: ''
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -65,7 +68,9 @@ interface StorageData {
 		legacyMode?: boolean;
 		silentOpen?: boolean;
 		openBehavior?: boolean | 'popup' | 'embedded';
-		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
+		saveBehavior?: 'addToObsidian' | 'addToDevonThink' | 'copyToClipboard' | 'saveFile';
+		devonthinkDestination?: string;
+		devonthinkTags?: string;
 	};
 	vaults?: string[];
 	highlighter_settings?: {
@@ -101,6 +106,7 @@ interface StorageData {
 	property_types?: PropertyType[];
 	stats?: {
 		addToObsidian: number;
+		addToDevonThink?: number;
 		saveFile: number;
 		copyToClipboard: number;
 		share: number;
@@ -134,7 +140,9 @@ export async function loadSettings(): Promise<Settings> {
 		interpreterAutoRun: false,
 		defaultPromptContext: '',
 		propertyTypes: [],
-		saveBehavior: 'addToObsidian',
+		saveBehavior: 'addToDevonThink',
+		devonthinkDestination: '',
+		devonthinkTags: '',
 		readerSettings: {
 			fontSize: 16,
 			lineHeight: 1.6,
@@ -154,6 +162,7 @@ export async function loadSettings(): Promise<Settings> {
 		},
 		stats: {
 			addToObsidian: 0,
+			addToDevonThink: 0,
 			saveFile: 0,
 			copyToClipboard: 0,
 			share: 0,
@@ -218,7 +227,9 @@ export async function loadSettings(): Promise<Settings> {
 		stats: { ...defaultSettings.stats, ...data.stats },
 		history: data.history || defaultSettings.history,
 		ratings: data.ratings || defaultSettings.ratings,
-		saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior
+		saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior,
+		devonthinkDestination: data.general_settings?.devonthinkDestination ?? defaultSettings.devonthinkDestination,
+		devonthinkTags: data.general_settings?.devonthinkTags ?? defaultSettings.devonthinkTags
 	};
 
 	generalSettings = loadedSettings;
@@ -240,6 +251,8 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			silentOpen: generalSettings.silentOpen,
 			openBehavior: generalSettings.openBehavior,
 			saveBehavior: generalSettings.saveBehavior,
+			devonthinkDestination: generalSettings.devonthinkDestination,
+			devonthinkTags: generalSettings.devonthinkTags,
 		},
 		highlighter_settings: {
 			highlighterEnabled: generalSettings.highlighterEnabled,

@@ -17,8 +17,26 @@
 	"addProviderTitle": {
 		"message": "Add provider"
 	},
+	"addToDevonThink": {
+		"message": "Clip to DEVONthink"
+	},
 	"addToObsidian": {
 		"message": "Add to Obsidian"
+	},
+	"devonthinkDestinationDescription": {
+		"message": "Optional. Copy the database or group link in DEVONthink and paste its UUID here. Leave empty to choose the destination each time."
+	},
+	"devonthinkDestinationLabel": {
+		"message": "DEVONthink destination UUID"
+	},
+	"devonthinkTagsDescription": {
+		"message": "Optional. Comma-separated tags added to clipped documents."
+	},
+	"devonthinkTagsLabel": {
+		"message": "DEVONthink tags"
+	},
+	"devonthinkTooLong": {
+		"message": "The clipped content is too long for DEVONthink's URL command. Try clipping a smaller selection."
 	},
 	"addVaultPlaceholder": {
 		"message": "Press enter to add a vault"

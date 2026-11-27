@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { Template, Property, PromptVariable } from '../types/types';
 import { incrementStat, addHistoryEntry, getClipHistory } from '../utils/storage-utils';
 import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-creator';
+import { saveToDevonThink } from '../utils/devonthink-note-creator';
 import { extractPageContent, initializePageContent } from '../utils/content-extractor';
 import { compileTemplate } from '../utils/template-compiler';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
@@ -1297,10 +1298,18 @@ function determineMainAction() {
 
 	// Set up actions based on saved behavior
 	switch (loadedSettings.saveBehavior) {
+		case 'addToDevonThink':
+			mainButton.textContent = getMessage('addToDevonThink');
+			mainButton.onclick = () => handleClipDevonThink();
+			addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
+			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
+			addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
+			break;
 		case 'copyToClipboard':
 			mainButton.textContent = getMessage('copyToClipboard');
 			mainButton.onclick = () => copyContent();
 			// Add direct actions to secondary
+			addSecondaryAction(secondaryActions, 'addToDevonThink', () => handleClipDevonThink());
 			addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
 			addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
 			break;
@@ -1308,6 +1317,7 @@ function determineMainAction() {
 			mainButton.textContent = getMessage('saveFile');
 			mainButton.onclick = () => handleSaveToDownloads();
 			// Add direct actions to secondary
+			addSecondaryAction(secondaryActions, 'addToDevonThink', () => handleClipDevonThink());
 			addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
 			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
 			break;
@@ -1315,6 +1325,7 @@ function determineMainAction() {
 			mainButton.textContent = getMessage('addToObsidian');
 			mainButton.onclick = () => handleClipObsidian();
 			// Add direct actions to secondary
+			addSecondaryAction(secondaryActions, 'addToDevonThink', () => handleClipDevonThink());
 			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
 			addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
 	}
@@ -1374,6 +1385,54 @@ async function handleClipObsidian(): Promise<void> {
 	}
 }
 
+async function handleClipDevonThink(): Promise<void> {
+	if (!currentTemplate) return;
+
+	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+	const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
+	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
+
+	if (!noteContentField) {
+		showError('Some required fields are missing. Please try reloading the extension.');
+		return;
+	}
+
+	try {
+		if (generalSettings.interpreterEnabled && interpretBtn && collectPromptVariables(currentTemplate).length > 0) {
+			if (interpretBtn.classList.contains('processing')) {
+				await waitForInterpreter(interpretBtn);
+			} else if (!interpretBtn.classList.contains('done')) {
+				interpretBtn.click();
+				await waitForInterpreter(interpretBtn);
+			}
+		}
+
+		const properties = getPropertiesFromDOM();
+		const frontmatter = await generateFrontmatter(properties);
+		const fileContent = frontmatter + noteContentField.value;
+
+		const noteName = noteNameField?.value || '';
+		const tabInfo = await getCurrentTabInfo();
+
+		await saveToDevonThink(
+			fileContent,
+			noteName,
+			tabInfo.url || '',
+			generalSettings.devonthinkDestination || '',
+			generalSettings.devonthinkTags || ''
+		);
+		await incrementStat('addToDevonThink', '', '', tabInfo.url, tabInfo.title);
+
+		if (!isSidePanel) {
+			setTimeout(() => window.close(), 500);
+		}
+	} catch (error) {
+		console.error('Error in handleClipDevonThink:', error);
+		showError(error instanceof Error ? error.message : 'failedToSaveFile');
+		throw error;
+	}
+}
+
 function addSecondaryAction(container: Element, actionType: string, handler: () => void) {
 	const menuItem = document.createElement('div');
 	menuItem.className = 'menu-item';
@@ -1406,6 +1465,7 @@ function getActionIcon(actionType: string): string {
 		case 'copyToClipboard': return 'copy';
 		case 'saveFile': return 'file-down';
 		case 'addToObsidian': return 'pen-line';
+		case 'addToDevonThink': return 'bookmark';
 		default: return 'plus';
 	}
 }

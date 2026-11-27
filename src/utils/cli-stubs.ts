@@ -42,6 +42,7 @@ export const generalSettings: Settings = {
 	},
 	stats: {
 		addToObsidian: 0,
+		addToDevonThink: 0,
 		saveFile: 0,
 		copyToClipboard: 0,
 		share: 0,
@@ -49,7 +50,9 @@ export const generalSettings: Settings = {
 	},
 	history: [],
 	ratings: [],
-	saveBehavior: 'addToObsidian',
+	saveBehavior: 'addToDevonThink',
+	devonthinkDestination: '',
+	devonthinkTags: '',
 };
 
 export const loadSettings = async () => {};
