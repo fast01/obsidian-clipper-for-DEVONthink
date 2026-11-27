@@ -42,23 +42,21 @@ export async function saveToDevonThink(
 ): Promise<void> {
 	const title = noteName || 'Web clip';
 	const isHtml = format === 'html';
-	// DEVONthink 4.4.2 silently ignores createHTML/createFormattedNote URL
-	// commands (verified: only createMarkdown created a document). But its
-	// Markdown renderer DOES render inline HTML tags. So in HTML mode we still
-	// use createMarkdown, passing the extracted HTML fragment as `text` — this
-	// preserves tables, bold, links, etc. while keeping the reliable command.
-	const parts: string[] = [
-		urlParam('title', title),
-		urlParam('text', fileContent)
-	];
 
-	// Do NOT pass `location`: DEVONthink treats it as a URL to download and
-	// convert itself, discarding `text`. In HTML mode carry the source URL in
-	// `comment` so it survives as metadata (Markdown mode has it in frontmatter).
-	if (isHtml && location) {
-		parts.push(urlParam('comment', location));
+	const parts: string[] = [urlParam('title', title)];
+	if (isHtml) {
+		// HTML mode: real .html document with our extracted HTML as `source`.
+		// Verified on DT 4.4.2: createHTML needs `location` present to act at all
+		// (without it the command is a silent no-op), but when both are given,
+		// `source` content is preserved and `location` only supplies the URL
+		// metadata — it does NOT re-download the page (unlike createMarkdown).
+		parts.push(urlParam('source', fileContent));
+		if (location) parts.push(urlParam('location', location));
+	} else {
+		// Markdown mode: never pass `location` — createMarkdown treats it as a
+		// URL to download, discarding `text`. Source URL lives in frontmatter.
+		parts.push(urlParam('text', fileContent));
 	}
-	void location;
 	if (tags) {
 		parts.push(urlParam('tags', tags));
 	}
@@ -68,12 +66,13 @@ export async function saveToDevonThink(
 		parts.push(urlParam('noselector', '1'));
 	}
 
-	const url = `x-devonthink://createMarkdown?${parts.join('&')}`;
+	const command = isHtml ? 'createHTML' : 'createMarkdown';
+	const url = `x-devonthink://${command}?${parts.join('&')}`;
 
 	if (url.length > MAX_URL_LENGTH) {
 		throw new Error('devonthinkTooLong');
 	}
 
-	console.log(`DEVONthink createMarkdown (${format}) URL length:`, url.length);
+	console.log(`DEVONthink ${command} URL length:`, url.length);
 	openExternalUrl(url);
 }
