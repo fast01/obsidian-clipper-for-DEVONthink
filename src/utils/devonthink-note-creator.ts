@@ -42,17 +42,19 @@ export async function saveToDevonThink(
 ): Promise<void> {
 	const title = noteName || 'Web clip';
 	const isHtml = format === 'html';
-	// Send the HTML body as-is. DEVONthink wraps it in a document itself;
-	// embedding a full <!DOCTYPE>/<html> inside `source` has been observed to
-	// silently create no document in DT 4.4.2.
+	// DEVONthink 4.4.2 silently ignores createHTML/createFormattedNote URL
+	// commands (verified: only createMarkdown created a document). But its
+	// Markdown renderer DOES render inline HTML tags. So in HTML mode we still
+	// use createMarkdown, passing the extracted HTML fragment as `text` — this
+	// preserves tables, bold, links, etc. while keeping the reliable command.
 	const parts: string[] = [
 		urlParam('title', title),
-		urlParam(isHtml ? 'source' : 'text', fileContent)
+		urlParam('text', fileContent)
 	];
 
 	// Do NOT pass `location`: DEVONthink treats it as a URL to download and
-	// convert itself, discarding `text`/`source`. For HTML, put the source URL
-	// in `comment` (supported for all commands) so it survives as metadata.
+	// convert itself, discarding `text`. In HTML mode carry the source URL in
+	// `comment` so it survives as metadata (Markdown mode has it in frontmatter).
 	if (isHtml && location) {
 		parts.push(urlParam('comment', location));
 	}
@@ -66,13 +68,12 @@ export async function saveToDevonThink(
 		parts.push(urlParam('noselector', '1'));
 	}
 
-	const command = isHtml ? 'createHTML' : 'createMarkdown';
-	const url = `x-devonthink://${command}?${parts.join('&')}`;
+	const url = `x-devonthink://createMarkdown?${parts.join('&')}`;
 
 	if (url.length > MAX_URL_LENGTH) {
 		throw new Error('devonthinkTooLong');
 	}
 
-	console.log(`DEVONthink ${command} URL length:`, url.length);
+	console.log(`DEVONthink createMarkdown (${format}) URL length:`, url.length);
 	openExternalUrl(url);
 }

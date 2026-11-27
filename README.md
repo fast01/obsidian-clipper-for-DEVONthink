@@ -54,7 +54,7 @@ Notes:
 Above the main button there is a **Format** switch with **Markdown** and **HTML**:
 
 - **Markdown** (default): clean Markdown with YAML frontmatter — best for notes, search and linking.
-- **HTML**: saves the extracted page HTML into a DEVONthink HTML document — preserves the original formatting (tables, nested structure, styling) much better.
+- **HTML**: saves the extracted page HTML into the document — DEVONthink's Markdown renderer displays the embedded HTML tags (tables, bold, links, etc.), preserving much more of the original layout than plain Markdown.
 
 The selection is remembered and reused next time. Both formats support destination groups, tags, and highlighted clips. Very large pages may exceed the URL-command size limit; if that happens, use Markdown.
 
