@@ -42,9 +42,11 @@ export async function saveToDevonThink(
 		urlParam('text', fileContent)
 	];
 
-	if (location) {
-		parts.push(urlParam('location', location));
-	}
+	// Do NOT pass `location` to createMarkdown: DEVONthink treats it as a URL
+	// to download and convert itself, discarding `text` entirely. That would
+	// replace our (possibly highlight-only) Markdown with the full page.
+	// The source URL is already preserved in the frontmatter's `source` field.
+	void location;
 	if (tags) {
 		parts.push(urlParam('tags', tags));
 	}

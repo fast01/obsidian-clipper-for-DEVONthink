@@ -86,7 +86,13 @@ fi
 if [ "${DO_SYNC}" -eq 1 ]; then
 	if [ -d "${EDGE_DIR}" ]; then
 		echo "==> 同步到 Edge 加载目录: ${EDGE_DIR}"
-		rsync -a "${DIST}/" "${EDGE_DIR}/"
+		# Use in-place copies instead of rsync's atomic replace: the sandbox
+		# blocks rsync's delete/rename of existing files, which leaves hidden
+		# .<file>.<random> temp files behind. cp -f overwrites in place.
+		while IFS= read -r -d '' src_file; do
+			rel="${src_file#${DIST}/}"
+			cp -f "${src_file}" "${EDGE_DIR}/${rel}"
+		done < <(find "${DIST}" -type f -print0)
 	else
 		echo "==> 警告: Edge 加载目录不存在，跳过同步: ${EDGE_DIR}" >&2
 	fi

@@ -5,7 +5,7 @@ import { ReaderSettings } from '../types/types';
 import { getFontCss } from '../utils/font-utils';
 import { getDomain } from '../utils/string-utils';
 import { extractContentBySelector as extractContentBySelectorShared } from '../utils/shared';
-import { setPageUrl, setPageTitle, updatePageDomainSettings, getHighlights, repositionHighlights } from '../utils/highlighter';
+import { setPageUrl, setPageTitle, updatePageDomainSettings, getHighlights, repositionHighlights, applyHighlights } from '../utils/highlighter';
 import { throttle } from '../utils/throttle';
 import { loadSettings } from '../utils/storage-utils';
 import Defuddle from 'defuddle';
@@ -90,6 +90,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 		document.head.appendChild(highlighterLink);
 
 		await loadSettings();
+
+		// Reader.apply() renders highlights, but the click-to-remove listener
+		// (syncHoverListener) can be skipped if that render bailed early. Force
+		// one more apply so clicking a highlight reliably shows the Remove
+		// button in reader mode, just like on a normal page.
+		applyHighlights();
 
 		if (result.title) {
 			document.title = result.title;
