@@ -24,7 +24,7 @@
 		"message": "添加到 Obsidian"
 	},
 	"devonthinkDestinationDescription": {
-		"message": "可选。在 DEVONthink 中复制数据库或分组的链接，把其中的 UUID 填到这里。留空则每次剪切时手动选择目标。"
+		"message": "可选。直接粘贴 DEVONthink 的分组链接（如 x-devonthink-item://...）或只填 UUID。留空则每次剪切时手动选择目标。"
 	},
 	"devonthinkDestinationLabel": {
 		"message": "DEVONthink 目标 UUID"

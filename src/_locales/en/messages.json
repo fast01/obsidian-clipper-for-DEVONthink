@@ -24,7 +24,7 @@
 		"message": "Add to Obsidian"
 	},
 	"devonthinkDestinationDescription": {
-		"message": "Optional. Copy the database or group link in DEVONthink and paste its UUID here. Leave empty to choose the destination each time."
+		"message": "Optional. Paste a DEVONthink database or group item link (or just its UUID) here. Leave empty to choose the destination each time."
 	},
 	"devonthinkDestinationLabel": {
 		"message": "DEVONthink destination UUID"

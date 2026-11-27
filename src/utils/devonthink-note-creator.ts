@@ -9,6 +9,15 @@ function urlParam(name: string, value: string): string {
 	return `${name}=${encodeURIComponent(value)}`;
 }
 
+// DEVONthink's destination parameter wants the bare UUID. Users naturally
+// paste the whole item link from the context menu, so accept both forms.
+function normalizeDestination(value: string): string {
+	const trimmed = value.trim();
+	if (!trimmed) return '';
+	const match = trimmed.match(/^x-devonthink(?:-item)?:\/\/([^/?#]+)/i);
+	return match ? match[1] : trimmed;
+}
+
 function openExternalUrl(url: string): void {
 	// The background handler is scheme-agnostic: it just calls tabs.update().
 	// Reusing it avoids duplicating the popup/iframe fallback logic.
@@ -39,8 +48,9 @@ export async function saveToDevonThink(
 	if (tags) {
 		parts.push(urlParam('tags', tags));
 	}
-	if (destination) {
-		parts.push(urlParam('destination', destination));
+	const normalizedDestination = normalizeDestination(destination);
+	if (normalizedDestination) {
+		parts.push(urlParam('destination', normalizedDestination));
 		parts.push(urlParam('noselector', '1'));
 	}
 
