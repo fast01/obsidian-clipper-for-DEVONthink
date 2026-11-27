@@ -1,3 +1,41 @@
+# Obsidian Web Clipper for DEVONthink
+
+> **This is a fork**: [fast01/obsidian-clipper-for-DEVONthink](https://github.com/fast01/obsidian-clipper-for-DEVONthink), based on [obsidianmd/obsidian-clipper](https://github.com/obsidianmd/obsidian-clipper). Development happens on the `devonthink-clip` branch.
+
+An enhanced Web Clipper that clips web pages **directly into DEVONthink** as Markdown, while keeping the original Obsidian behavior available. The default output target is DEVONthink; use the dropdown next to the main button to switch to Obsidian, copy to clipboard, or save a file.
+
+![Clip a page into DEVONthink](obsidian-webclipper-for-DEVONthink.png)
+
+## What's different from upstream
+
+- **DEVONthink as the default target** — clips go straight into DEVONthink via its `x-devonthink://createMarkdown` URL command (DEVONthink 4.4.2+ on macOS).
+- **Destination group** — set a group UUID (or paste its full item link) in settings to file clips into a specific group instead of the default Inbox. Tags are supported too.
+- **"Clip highlights"** — saves only the passages you highlighted, both on normal pages and in reader mode; reader mode also has a toolbar button for it, and highlighted passages can be removed there.
+- **One switch, four targets** — the main button follows the selected save behavior; the other three targets stay one click away in the dropdown.
+
+See [改造说明.md](改造说明.md) for the full design notes, mechanism, build instructions, and known limitations (Chinese).
+
+## Quick start (this fork)
+
+```bash
+git clone -b devonthink-clip https://github.com/fast01/obsidian-clipper-for-DEVONthink.git
+cd obsidian-clipper-for-DEVONthink
+npm ci
+./build.sh          # builds to dist/ and syncs to the configured Edge directory
+```
+
+Then in your browser: `chrome://extensions` (or `edge://extensions`) → **Developer mode** → **Load unpacked** → select `dist/`. In the extension settings, choose **Clip to DEVONthink** as the save behavior and (optionally) set the destination group UUID and tags.
+
+> CRX files from outside the Chrome Web Store can't be installed in current Chrome/Edge — load the unpacked directory. See [改造说明.md](改造说明.md) §6 for details.
+
+---
+
+## Upstream README (original)
+
+The following is the original project's README, kept for reference.
+
+---
+
 Obsidian Web Clipper helps you highlight and capture the web in your favorite browser. Anything you save is stored as durable Markdown files that you can read offline, and preserve for the long term.
 
 - **[Download Web Clipper](https://obsidian.md/clipper)**
