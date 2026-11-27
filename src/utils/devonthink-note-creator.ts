@@ -32,16 +32,6 @@ function openExternalUrl(url: string): void {
 
 export type DevonThinkFormat = 'markdown' | 'html';
 
-// Wrap the extracted HTML in a minimal document so DEVONthink renders it as a
-// real page. The source URL goes into <base>/<meta> instead of the URL's
-// `location` param, which would make DT re-download the page.
-function buildHtmlDocument(html: string, title: string, sourceUrl: string): string {
-	const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-	const baseTag = sourceUrl ? `<base href="${sourceUrl.replace(/"/g, '&quot;')}">` : '';
-	const metaTag = sourceUrl ? `<meta name="source" content="${sourceUrl.replace(/"/g, '&quot;')}">` : '';
-	return `<!DOCTYPE html><html><head><meta charset="utf-8">${baseTag}${metaTag}<title>${safeTitle}</title></head><body>${html}</body></html>`;
-}
-
 export async function saveToDevonThink(
 	fileContent: string,
 	noteName: string,
@@ -52,15 +42,20 @@ export async function saveToDevonThink(
 ): Promise<void> {
 	const title = noteName || 'Web clip';
 	const isHtml = format === 'html';
+	// Send the HTML body as-is. DEVONthink wraps it in a document itself;
+	// embedding a full <!DOCTYPE>/<html> inside `source` has been observed to
+	// silently create no document in DT 4.4.2.
 	const parts: string[] = [
 		urlParam('title', title),
-		urlParam(isHtml ? 'source' : 'text', isHtml ? buildHtmlDocument(fileContent, title, location) : fileContent)
+		urlParam(isHtml ? 'source' : 'text', fileContent)
 	];
 
-	// Do NOT pass `location` to createMarkdown/createHTML: DEVONthink treats it
-	// as a URL to download and convert itself, discarding `text`/`source`.
-	// For markdown the source URL lives in the frontmatter; for HTML it's in
-	// the document's <base>/<meta> (see buildHtmlDocument).
+	// Do NOT pass `location`: DEVONthink treats it as a URL to download and
+	// convert itself, discarding `text`/`source`. For HTML, put the source URL
+	// in `comment` (supported for all commands) so it survives as metadata.
+	if (isHtml && location) {
+		parts.push(urlParam('comment', location));
+	}
 	void location;
 	if (tags) {
 		parts.push(urlParam('tags', tags));

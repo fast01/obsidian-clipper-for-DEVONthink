@@ -751,6 +751,9 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 					extractedData.schemaOrgData
 				);
 
+				// Apply the selected DEVONthink format to the visible content area.
+				applyDevonThinkFormatToView();
+
 				// Update variables panel if it's open
 				updateVariablesPanel(currentTemplate, currentVariables);
 			} else {
@@ -955,6 +958,7 @@ async function fillTemplateFieldValues(currentTabId: number, template: Template 
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	if (noteContentField) {
 		noteContentField.value = template.noteContentFormat ? formattedContent : '';
+		cachedMarkdownContent = noteContentField.value;
 	}
 
 	if (generalSettings.interpreterEnabled) {
@@ -1297,6 +1301,23 @@ async function handleSaveToDownloads() {
 	}
 }
 
+let cachedMarkdownContent: string | null = null;
+
+// Switch the visible content area between the compiled Markdown (from the
+// template) and the extracted HTML that will be sent in HTML mode.
+function applyDevonThinkFormatToView(): void {
+	const contentField = document.getElementById('note-content-field') as HTMLTextAreaElement | null;
+	if (!contentField) return;
+	const format = generalSettings.devonthinkFormat || 'markdown';
+	if (format === 'html') {
+		if (cachedMarkdownContent === null) cachedMarkdownContent = contentField.value;
+		const html = currentVariables['{{contentHtml}}'];
+		if (html) contentField.value = html;
+	} else if (cachedMarkdownContent !== null) {
+		contentField.value = cachedMarkdownContent;
+	}
+}
+
 function initializeDevonThinkFormatRow(): void {
 	const row = document.getElementById('devonthink-format-row');
 	const group = document.getElementById('devonthink-format');
@@ -1313,11 +1334,13 @@ function initializeDevonThinkFormatRow(): void {
 			const format = btn.dataset.format === 'html' ? 'html' : 'markdown';
 			generalSettings.devonthinkFormat = format;
 			buttons.forEach(b => b.classList.toggle('active', b === btn));
+			applyDevonThinkFormatToView();
 			saveSettings({ devonthinkFormat: format }).catch((error: unknown) => {
 				console.warn('Could not save DEVONthink format:', error);
 			});
 		};
 	});
+	// Content isn't populated yet at this point; refreshFields() applies it later.
 }
 
 function determineMainAction() {
