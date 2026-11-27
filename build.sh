@@ -5,8 +5,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="${SCRIPT_DIR}"
 DIST="${REPO}/dist"
-# Edge loads the extension from this directory. Keep it in sync after each build.
-EDGE_DIR="/Users/admin/Downloads/SyncFolder/Mackup/tools/chrome-extension/obsidian-devonthink-cliper"
+# Optional: set EDGE_DIR to a browser "Load unpacked" directory to auto-sync
+# the build there. Unset by default so the script stays machine-independent.
+EDGE_DIR="${EDGE_DIR:-}"
 SKIP_INSTALL=0
 DO_SYNC=1
 
@@ -15,14 +16,15 @@ usage() {
 用法: ./build.sh [--no-install] [--help]
 
   --no-install   跳过 npm ci（依赖已存在时加快构建）
-  --no-sync      不同步到 Edge 加载目录
+  --no-sync      不同步到浏览器加载目录
   --help         显示本帮助
 
+环境变量:
+  EDGE_DIR       若设置，构建后把 dist/ 覆盖同步到该目录（浏览器"加载已解压的扩展程序"用的目录）
+
 产物:
-  obsidian-clipper/dist/                      可直接加载的扩展目录
-  obsidian-clipper/builds/*-chrome.zip        打包好的扩展压缩包
-  /Users/admin/Downloads/SyncFolder/Mackup/tools/chrome-extension/obsidian-devonthink-cliper
-                                   Edge 加载目录（默认自动同步）
+  dist/                    可直接加载的扩展目录
+  builds/*-chrome.zip      打包好的扩展压缩包
 EOF
 }
 
@@ -83,18 +85,18 @@ if ! grep -q "devonthink-destination-input" "${DIST}/settings.js"; then
 	exit 1
 fi
 
-if [ "${DO_SYNC}" -eq 1 ]; then
+if [ "${DO_SYNC}" -eq 1 ] && [ -n "${EDGE_DIR}" ]; then
 	if [ -d "${EDGE_DIR}" ]; then
-		echo "==> 同步到 Edge 加载目录: ${EDGE_DIR}"
-		# Use in-place copies instead of rsync's atomic replace: the sandbox
-		# blocks rsync's delete/rename of existing files, which leaves hidden
+		echo "==> 同步到加载目录: ${EDGE_DIR}"
+		# Use in-place copies instead of rsync's atomic replace: on some
+		# systems rsync's delete/rename is blocked and leaves hidden
 		# .<file>.<random> temp files behind. cp -f overwrites in place.
 		while IFS= read -r -d '' src_file; do
 			rel="${src_file#${DIST}/}"
 			cp -f "${src_file}" "${EDGE_DIR}/${rel}"
 		done < <(find "${DIST}" -type f -print0)
 	else
-		echo "==> 警告: Edge 加载目录不存在，跳过同步: ${EDGE_DIR}" >&2
+		echo "==> 警告: 加载目录不存在，跳过同步: ${EDGE_DIR}" >&2
 	fi
 fi
 
@@ -104,6 +106,6 @@ ZIP="$(ls -t "${REPO}"/builds/*-chrome.zip 2>/dev/null | head -n 1 || true)"
 if [ -n "${ZIP}" ]; then
 	echo "    打包文件: ${ZIP}"
 fi
-if [ "${DO_SYNC}" -eq 1 ] && [ -d "${EDGE_DIR}" ]; then
-	echo "    Edge 目录: ${EDGE_DIR}"
+if [ "${DO_SYNC}" -eq 1 ] && [ -n "${EDGE_DIR}" ] && [ -d "${EDGE_DIR}" ]; then
+	echo "    已同步到: ${EDGE_DIR}"
 fi
