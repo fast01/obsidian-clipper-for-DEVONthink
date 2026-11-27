@@ -712,6 +712,15 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 		if (extractedData) {
 			const currentUrl = tab.url;
 
+			// One-shot intent from the highlighter menu's "Clip highlights" button.
+			let highlightsOnly = false;
+			try {
+				const intent = await browser.runtime.sendMessage({ action: 'consumeClipHighlightsIntent' }) as { active?: boolean } | undefined;
+				highlightsOnly = intent?.active === true;
+			} catch (error) {
+				console.warn('Could not read clip-highlights intent:', error);
+			}
+
 			const initializedContent = await initializePageContent(
 				extractedData.content,
 				extractedData.selectedHtml,
@@ -729,7 +738,8 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 				extractedData.site,
 				extractedData.wordCount,
 				extractedData.language || '',
-				extractedData.metaTags
+				extractedData.metaTags,
+				highlightsOnly
 			);
 			if (initializedContent) {
 				currentVariables = initializedContent.currentVariables;

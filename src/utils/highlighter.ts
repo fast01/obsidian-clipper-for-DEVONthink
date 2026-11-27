@@ -339,7 +339,7 @@ async function handleClipButtonClick(e: Event) {
 	const browserType = await detectBrowser();
 
 	try {
-		const response = await browser.runtime.sendMessage({action: "openPopup"});
+		const response = await browser.runtime.sendMessage({action: "openPopup", clipHighlights: true});
 		if (response && typeof response === 'object' && 'success' in response) {
 			if (!response.success) {
 				throw new Error((response as { error?: string }).error || 'Unknown error');

@@ -397,7 +397,7 @@ browser.runtime.onMessage.addListener((request: unknown) => {
 
 browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
-		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; section?: string; readerUrl?: string; url?: string };
+		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; clipHighlights?: boolean; tabId?: number; text?: string; section?: string; readerUrl?: string; url?: string };
 
 		if (typedRequest.action === 'loadContentScriptForHighlights') {
 			const tabId = sender.tab?.id;
@@ -558,6 +558,14 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		}
 
 		if (typedRequest.action === "openPopup") {
+			// One-shot intent: the highlighter menu's "Clip highlights" button
+			// wants the note body to contain only the highlighted passages.
+			// Consumed (and cleared) by the popup on its next field refresh.
+			if (typedRequest.clipHighlights) {
+				browser.storage.local.set({ clipHighlightsIntent: true }).catch((error: unknown) => {
+					console.error('Failed to store clip-highlights intent:', error);
+				});
+			}
 			openPopup()
 				.then(() => {
 					sendResponse({ success: true });
@@ -566,6 +574,20 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 					console.error('Error opening popup in background script:', error);
 					sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
 				});
+			return true;
+		}
+
+		if (typedRequest.action === "consumeClipHighlightsIntent") {
+			browser.storage.local.get('clipHighlightsIntent').then(async (result: Record<string, unknown>) => {
+				const active = result.clipHighlightsIntent === true;
+				if (active) {
+					await browser.storage.local.remove('clipHighlightsIntent');
+				}
+				sendResponse({ active });
+			}).catch((error: unknown) => {
+				console.error('Failed to consume clip-highlights intent:', error);
+				sendResponse({ active: false });
+			});
 			return true;
 		}
 

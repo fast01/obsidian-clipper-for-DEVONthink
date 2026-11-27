@@ -141,7 +141,8 @@ export async function initializePageContent(
 	site: string,
 	wordCount: number,
 	language: string,
-	metaTags: { name?: string | null; property?: string | null; content: string | null }[]
+	metaTags: { name?: string | null; property?: string | null; content: string | null }[],
+	highlightsOnly = false
 ) {
 	try {
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
@@ -152,8 +153,11 @@ export async function initializePageContent(
 			selectedMarkdown = createMarkdownContent(selectedHtml, currentUrl);
 		}
 
-		// Process highlights after getting the base content
-		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
+		// "Clip highlights" from the highlighter menu must yield only the highlighted
+		// passages, regardless of the global highlightBehavior setting.
+		if (highlightsOnly && highlights && highlights.length > 0) {
+			content = highlights.map(highlight => highlight.content).join('');
+		} else if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
 			content = processHighlights(content, highlights);
 		}
 

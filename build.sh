@@ -5,24 +5,31 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="${SCRIPT_DIR}"
 DIST="${REPO}/dist"
+# Edge loads the extension from this directory. Keep it in sync after each build.
+EDGE_DIR="/Users/admin/Downloads/SyncFolder/Mackup/tools/chrome-extension/obsidian-devonthink-cliper"
 SKIP_INSTALL=0
+DO_SYNC=1
 
 usage() {
 	cat <<'EOF'
 用法: ./build.sh [--no-install] [--help]
 
   --no-install   跳过 npm ci（依赖已存在时加快构建）
+  --no-sync      不同步到 Edge 加载目录
   --help         显示本帮助
 
 产物:
   obsidian-clipper/dist/                      可直接加载的扩展目录
   obsidian-clipper/builds/*-chrome.zip        打包好的扩展压缩包
+  /Users/admin/Downloads/SyncFolder/Mackup/tools/chrome-extension/obsidian-devonthink-cliper
+                                   Edge 加载目录（默认自动同步）
 EOF
 }
 
 for arg in "$@"; do
 	case "${arg}" in
 		--no-install) SKIP_INSTALL=1 ;;
+		--no-sync) DO_SYNC=0 ;;
 		-h|--help) usage; exit 0 ;;
 		*) echo "未知参数: ${arg}" >&2; usage >&2; exit 2 ;;
 	esac
@@ -76,9 +83,21 @@ if ! grep -q "devonthink-destination-input" "${DIST}/settings.js"; then
 	exit 1
 fi
 
+if [ "${DO_SYNC}" -eq 1 ]; then
+	if [ -d "${EDGE_DIR}" ]; then
+		echo "==> 同步到 Edge 加载目录: ${EDGE_DIR}"
+		rsync -a "${DIST}/" "${EDGE_DIR}/"
+	else
+		echo "==> 警告: Edge 加载目录不存在，跳过同步: ${EDGE_DIR}" >&2
+	fi
+fi
+
 echo "==> 构建完成"
 echo "    扩展目录: ${DIST}"
 ZIP="$(ls -t "${REPO}"/builds/*-chrome.zip 2>/dev/null | head -n 1 || true)"
 if [ -n "${ZIP}" ]; then
 	echo "    打包文件: ${ZIP}"
+fi
+if [ "${DO_SYNC}" -eq 1 ] && [ -d "${EDGE_DIR}" ]; then
+	echo "    Edge 目录: ${EDGE_DIR}"
 fi
