@@ -4,6 +4,12 @@
 
 An enhanced Web Clipper that clips web pages **directly into DEVONthink** as Markdown, while keeping the original Obsidian behavior available. The default output target is DEVONthink; use the dropdown next to the main button to switch to Obsidian, copy to clipboard, or save a file.
 
+## 📦 Download
+
+**[⬇️ Download the latest extension ZIP](https://github.com/fast01/obsidian-clipper-for-DEVONthink/releases/latest/download/obsidian-web-clipper-1.8.5-chrome.zip)** — ~4.4 MB, points to the newest release. ([All releases](https://github.com/fast01/obsidian-clipper-for-DEVONthink/releases))
+
+> To keep the link working across updates, future releases should reuse the same asset filename `obsidian-web-clipper-1.8.5-chrome.zip`. If a release renames it, update this link too.
+
 ![Clip a page into DEVONthink](obsidian-webclipper-for-DEVONthink.png)
 
 ## What's different from upstream
@@ -13,20 +19,52 @@ An enhanced Web Clipper that clips web pages **directly into DEVONthink** as Mar
 - **"Clip highlights"** — saves only the passages you highlighted, both on normal pages and in reader mode; reader mode also has a toolbar button for it, and highlighted passages can be removed there.
 - **One switch, four targets** — the main button follows the selected save behavior; the other three targets stay one click away in the dropdown.
 
-See [改造说明.md](改造说明.md) for the full design notes, mechanism, build instructions, and known limitations (Chinese).
+See [改造说明.md](改造说明.md) for the full design notes, mechanism, and known limitations (Chinese).
 
-## Quick start (this fork)
+## How to use
+
+### Install
+
+1. Download the ZIP from the link above and **unzip it** to a folder you'll keep (e.g. `obsidian-clipper-for-DEVONthink`).
+2. In your browser go to `chrome://extensions` (Chrome/Brave/Arc) or `edge://extensions` (Edge), turn on **Developer mode**.
+3. Click **Load unpacked** and select the **unzipped folder** (the one containing `manifest.json`).
+4. After every update: download the new ZIP, extract over the same folder, then click the extension's **Reload** button on the extensions page.
+
+> Don't try to install a `.crx` by dragging it into the browser: current Chrome/Edge reject CRX files that aren't signed by the Web Store. Load the unpacked folder instead. The ZIP is just a convenient way to distribute that folder.
+
+### Set up DEVONthink
+
+All DEVONthink options live in the extension's **Settings** page (right-click the toolbar icon → Options, or `chrome://extensions` → Details → Extension options), under **Behavior**:
+
+1. **Save behavior → `Clip to DEVONthink`**. This is the default. The main button then reads "Clip to DEVONthink"; the other targets (Add to Obsidian / Copy to clipboard / Save file) remain in the dropdown arrow next to it.
+2. **DEVONthink destination UUID** (optional) — where clips are filed:
+   - Leave it **empty** to pick the destination group in DEVONthink each time.
+   - To always use the same group, in DEVONthink right-click the database or group → **Copy Item Link**, then paste the whole link here (e.g. `x-devonthink-item://B07187CC-...`). A bare UUID works too. With this set, clips go straight into that group with no prompt.
+3. **DEVONthink tags** (optional) — comma-separated tags added to each clipped document, e.g. `web, reading`.
+
+Notes:
+
+- You need **DEVONthink 3/4 on macOS** running (the `x-devonthink` URL scheme is registered by the app). DEVONthink will come to the foreground when a clip is sent.
+- The clip is created as a **Markdown document** with YAML frontmatter (`title`, `source`, `author`, `published`, `created`, `description`, `tags`). The source URL is preserved in `source`.
+- The main button clips the article body. To save only highlighted passages, see below.
+
+### Clip highlights
+
+1. Select text on the page with the mouse to create highlights (with the highlighter pen turned on in the toolbar/menu).
+2. Click the purple **Clip highlights** button — in the highlighter menu on normal pages, or the toolbar button (next to the pen) in reader mode.
+3. The popup opens with **only the highlighted passages** in the content box; click **Clip to DEVONthink** to save them as Markdown.
+4. Clicking a highlight shows a floating **Remove** button, so you can delete individual highlights (also works in reader mode).
+
+### Build from source (optional)
 
 ```bash
 git clone -b devonthink-clip https://github.com/fast01/obsidian-clipper-for-DEVONthink.git
 cd obsidian-clipper-for-DEVONthink
 npm ci
-./build.sh          # builds to dist/ and syncs to the configured Edge directory
+./build.sh
 ```
 
-Then in your browser: `chrome://extensions` (or `edge://extensions`) → **Developer mode** → **Load unpacked** → select `dist/`. In the extension settings, choose **Clip to DEVONthink** as the save behavior and (optionally) set the destination group UUID and tags.
-
-> CRX files from outside the Chrome Web Store can't be installed in current Chrome/Edge — load the unpacked directory. See [改造说明.md](改造说明.md) §6 for details.
+`./build.sh` builds to `dist/` and writes the distributable ZIP under `builds/`. Optionally set `EDGE_DIR=/path/to/unpacked/folder` to auto-sync the build into your browser's load directory.
 
 ---
 
