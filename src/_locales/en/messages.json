@@ -127,6 +127,15 @@
 	"clipHighlights": {
 		"message": "Clip highlights"
 	},
+	"devonthinkFormat": {
+		"message": "Format"
+	},
+	"devonthinkFormatMarkdown": {
+		"message": "Markdown"
+	},
+	"devonthinkFormatHtml": {
+		"message": "HTML"
+	},
 	"clipboardError": {
 		"message": "Obsidian is not able to access your clipboard. Try the troubleshooting instructions here: $1",
 		"placeholders": {

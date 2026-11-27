@@ -30,22 +30,37 @@ function openExternalUrl(url: string): void {
 	});
 }
 
+export type DevonThinkFormat = 'markdown' | 'html';
+
+// Wrap the extracted HTML in a minimal document so DEVONthink renders it as a
+// real page. The source URL goes into <base>/<meta> instead of the URL's
+// `location` param, which would make DT re-download the page.
+function buildHtmlDocument(html: string, title: string, sourceUrl: string): string {
+	const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	const baseTag = sourceUrl ? `<base href="${sourceUrl.replace(/"/g, '&quot;')}">` : '';
+	const metaTag = sourceUrl ? `<meta name="source" content="${sourceUrl.replace(/"/g, '&quot;')}">` : '';
+	return `<!DOCTYPE html><html><head><meta charset="utf-8">${baseTag}${metaTag}<title>${safeTitle}</title></head><body>${html}</body></html>`;
+}
+
 export async function saveToDevonThink(
 	fileContent: string,
 	noteName: string,
 	location: string,
 	destination: string,
-	tags: string
+	tags: string,
+	format: DevonThinkFormat = 'markdown'
 ): Promise<void> {
+	const title = noteName || 'Web clip';
+	const isHtml = format === 'html';
 	const parts: string[] = [
-		urlParam('title', noteName || 'Web clip'),
-		urlParam('text', fileContent)
+		urlParam('title', title),
+		urlParam(isHtml ? 'source' : 'text', isHtml ? buildHtmlDocument(fileContent, title, location) : fileContent)
 	];
 
-	// Do NOT pass `location` to createMarkdown: DEVONthink treats it as a URL
-	// to download and convert itself, discarding `text` entirely. That would
-	// replace our (possibly highlight-only) Markdown with the full page.
-	// The source URL is already preserved in the frontmatter's `source` field.
+	// Do NOT pass `location` to createMarkdown/createHTML: DEVONthink treats it
+	// as a URL to download and convert itself, discarding `text`/`source`.
+	// For markdown the source URL lives in the frontmatter; for HTML it's in
+	// the document's <base>/<meta> (see buildHtmlDocument).
 	void location;
 	if (tags) {
 		parts.push(urlParam('tags', tags));
@@ -56,12 +71,13 @@ export async function saveToDevonThink(
 		parts.push(urlParam('noselector', '1'));
 	}
 
-	const url = `x-devonthink://createMarkdown?${parts.join('&')}`;
+	const command = isHtml ? 'createHTML' : 'createMarkdown';
+	const url = `x-devonthink://${command}?${parts.join('&')}`;
 
 	if (url.length > MAX_URL_LENGTH) {
 		throw new Error('devonthinkTooLong');
 	}
 
-	console.log('DEVONthink URL length:', url.length);
+	console.log(`DEVONthink ${command} URL length:`, url.length);
 	openExternalUrl(url);
 }

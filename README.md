@@ -18,6 +18,7 @@ An enhanced Web Clipper that clips web pages **directly into DEVONthink** as Mar
 - **Destination group** — set a group UUID (or paste its full item link) in settings to file clips into a specific group instead of the default Inbox. Tags are supported too.
 - **"Clip highlights"** — saves only the passages you highlighted, both on normal pages and in reader mode; reader mode also has a toolbar button for it, and highlighted passages can be removed there.
 - **One switch, four targets** — the main button follows the selected save behavior; the other three targets stay one click away in the dropdown.
+- **Markdown or HTML output** — a format switch right above the main button lets you save either clean Markdown or the full HTML (preserves original page formatting). Your choice is remembered for next time.
 
 See [改造说明.md](改造说明.md) for the full design notes, mechanism, and known limitations (Chinese).
 
@@ -47,6 +48,15 @@ Notes:
 - You need **DEVONthink 3/4 on macOS** running (the `x-devonthink` URL scheme is registered by the app). DEVONthink will come to the foreground when a clip is sent.
 - The clip is created as a **Markdown document** with YAML frontmatter (`title`, `source`, `author`, `published`, `created`, `description`, `tags`). The source URL is preserved in `source`.
 - The main button clips the article body. To save only highlighted passages, see below.
+
+### Choose the output format
+
+Above the main button there is a **Format** switch with **Markdown** and **HTML**:
+
+- **Markdown** (default): clean Markdown with YAML frontmatter — best for notes, search and linking.
+- **HTML**: saves the extracted page HTML into a DEVONthink HTML document — preserves the original formatting (tables, nested structure, styling) much better.
+
+The selection is remembered and reused next time. Both formats support destination groups, tags, and highlighted clips. Very large pages may exceed the URL-command size limit; if that happens, use Markdown.
 
 ### Clip highlights
 

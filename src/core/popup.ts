@@ -7,7 +7,7 @@ import { extractPageContent, initializePageContent } from '../utils/content-extr
 import { compileTemplate } from '../utils/template-compiler';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { findMatchingTemplate, initializeTriggers } from '../utils/triggers';
-import { getLocalStorage, setLocalStorage, loadSettings, generalSettings, Settings } from '../utils/storage-utils';
+import { getLocalStorage, setLocalStorage, loadSettings, saveSettings, generalSettings, Settings } from '../utils/storage-utils';
 import { escapeHtml, unescapeValue } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 import browser from '../utils/browser-polyfill';
@@ -1297,6 +1297,29 @@ async function handleSaveToDownloads() {
 	}
 }
 
+function initializeDevonThinkFormatRow(): void {
+	const row = document.getElementById('devonthink-format-row');
+	const group = document.getElementById('devonthink-format');
+	if (!row || !group) return;
+
+	// Only relevant when clipping to DEVONthink.
+	row.style.display = loadedSettings.saveBehavior === 'addToDevonThink' ? 'flex' : 'none';
+
+	const current = generalSettings.devonthinkFormat || 'markdown';
+	const buttons = group.querySelectorAll<HTMLButtonElement>('button[data-format]');
+	buttons.forEach(btn => {
+		btn.classList.toggle('active', btn.dataset.format === current);
+		btn.onclick = () => {
+			const format = btn.dataset.format === 'html' ? 'html' : 'markdown';
+			generalSettings.devonthinkFormat = format;
+			buttons.forEach(b => b.classList.toggle('active', b === btn));
+			saveSettings({ devonthinkFormat: format }).catch((error: unknown) => {
+				console.warn('Could not save DEVONthink format:', error);
+			});
+		};
+	});
+}
+
 function determineMainAction() {
 	const mainButton = document.getElementById('clip-btn');
 	const moreDropdown = document.getElementById('more-dropdown');
@@ -1305,6 +1328,7 @@ function determineMainAction() {
 
 	// Clear existing secondary actions
 	secondaryActions.textContent = '';
+	initializeDevonThinkFormatRow();
 
 	// Set up actions based on saved behavior
 	switch (loadedSettings.saveBehavior) {
@@ -1417,9 +1441,17 @@ async function handleClipDevonThink(): Promise<void> {
 			}
 		}
 
-		const properties = getPropertiesFromDOM();
-		const frontmatter = await generateFrontmatter(properties);
-		const fileContent = frontmatter + noteContentField.value;
+		const format = generalSettings.devonthinkFormat || 'markdown';
+		let fileContent: string;
+		if (format === 'html') {
+			// contentHtml is the Defuddle-processed HTML (with highlights applied).
+			// Reuse it straight away; YAML frontmatter is Markdown-only.
+			fileContent = currentVariables['{{contentHtml}}'] || noteContentField.value;
+		} else {
+			const properties = getPropertiesFromDOM();
+			const frontmatter = await generateFrontmatter(properties);
+			fileContent = frontmatter + noteContentField.value;
+		}
 
 		const noteName = noteNameField?.value || '';
 		const tabInfo = await getCurrentTabInfo();
@@ -1429,7 +1461,8 @@ async function handleClipDevonThink(): Promise<void> {
 			noteName,
 			tabInfo.url || '',
 			generalSettings.devonthinkDestination || '',
-			generalSettings.devonthinkTags || ''
+			generalSettings.devonthinkTags || '',
+			format
 		);
 		await incrementStat('addToDevonThink', '', '', tabInfo.url, tabInfo.title);
 

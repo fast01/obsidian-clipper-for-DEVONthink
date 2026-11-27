@@ -76,8 +76,12 @@ echo "==> 校验产物"
 test -f "${DIST}/manifest.json" || { echo "缺少 manifest.json" >&2; exit 1; }
 test -f "${DIST}/popup.js" || { echo "缺少 popup.js" >&2; exit 1; }
 test -f "${DIST}/settings.js" || { echo "缺少 settings.js" >&2; exit 1; }
-if ! grep -q "x-devonthink://createMarkdown" "${DIST}/popup.js"; then
-	echo "popup.js 中未找到 DEVONthink 命令，构建可能用了旧代码" >&2
+if ! grep -q "createMarkdown" "${DIST}/popup.js" || ! grep -q "createHTML" "${DIST}/popup.js"; then
+	echo "popup.js 中未找到 DEVONthink 命令（createMarkdown/createHTML），构建可能用了旧代码" >&2
+	exit 1
+fi
+if ! grep -q "devonthink-format" "${DIST}/popup.js"; then
+	echo "popup.js 中未找到格式切换控件，构建可能用了旧代码" >&2
 	exit 1
 fi
 if ! grep -q "devonthink-destination-input" "${DIST}/settings.js"; then

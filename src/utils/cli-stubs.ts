@@ -53,6 +53,7 @@ export const generalSettings: Settings = {
 	saveBehavior: 'addToDevonThink',
 	devonthinkDestination: '',
 	devonthinkTags: '',
+	devonthinkFormat: 'markdown',
 };
 
 export const loadSettings = async () => {};

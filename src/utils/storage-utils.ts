@@ -50,7 +50,8 @@ export let generalSettings: Settings = {
 	ratings: [],
 	saveBehavior: 'addToDevonThink',
 	devonthinkDestination: '',
-	devonthinkTags: ''
+	devonthinkTags: '',
+	devonthinkFormat: 'markdown'
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -71,6 +72,7 @@ interface StorageData {
 		saveBehavior?: 'addToObsidian' | 'addToDevonThink' | 'copyToClipboard' | 'saveFile';
 		devonthinkDestination?: string;
 		devonthinkTags?: string;
+		devonthinkFormat?: 'markdown' | 'html';
 	};
 	vaults?: string[];
 	highlighter_settings?: {
@@ -143,6 +145,7 @@ export async function loadSettings(): Promise<Settings> {
 		saveBehavior: 'addToDevonThink',
 		devonthinkDestination: '',
 		devonthinkTags: '',
+		devonthinkFormat: 'markdown',
 		readerSettings: {
 			fontSize: 16,
 			lineHeight: 1.6,
@@ -229,7 +232,8 @@ export async function loadSettings(): Promise<Settings> {
 		ratings: data.ratings || defaultSettings.ratings,
 		saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior,
 		devonthinkDestination: data.general_settings?.devonthinkDestination ?? defaultSettings.devonthinkDestination,
-		devonthinkTags: data.general_settings?.devonthinkTags ?? defaultSettings.devonthinkTags
+		devonthinkTags: data.general_settings?.devonthinkTags ?? defaultSettings.devonthinkTags,
+		devonthinkFormat: data.general_settings?.devonthinkFormat ?? defaultSettings.devonthinkFormat
 	};
 
 	generalSettings = loadedSettings;
@@ -253,6 +257,7 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			saveBehavior: generalSettings.saveBehavior,
 			devonthinkDestination: generalSettings.devonthinkDestination,
 			devonthinkTags: generalSettings.devonthinkTags,
+			devonthinkFormat: generalSettings.devonthinkFormat,
 		},
 		highlighter_settings: {
 			highlighterEnabled: generalSettings.highlighterEnabled,

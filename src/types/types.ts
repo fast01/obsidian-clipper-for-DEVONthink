@@ -99,6 +99,7 @@ export interface Settings {
 	saveBehavior: SaveBehavior;
 	devonthinkDestination: string;
 	devonthinkTags: string;
+	devonthinkFormat: 'markdown' | 'html';
 }
 
 export interface ModelConfig {

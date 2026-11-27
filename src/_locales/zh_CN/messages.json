@@ -127,6 +127,15 @@
 	"clipHighlights": {
 		"message": "剪切高亮内容"
 	},
+	"devonthinkFormat": {
+		"message": "格式"
+	},
+	"devonthinkFormatMarkdown": {
+		"message": "Markdown"
+	},
+	"devonthinkFormatHtml": {
+		"message": "HTML"
+	},
 	"clipboardError": {
 		"message": "Obsidian 无法访问你的剪贴板。请尝试此处的故障排除说明：$1",
 		"placeholders": {
