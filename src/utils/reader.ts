@@ -233,6 +233,23 @@ export class Reader {
 		this.highlighterObserver = new MutationObserver(syncHighlighterBtn);
 		this.highlighterObserver.observe(doc.body, { attributes: true, attributeFilter: ['class'] });
 
+		// Clip highlights button (reader mode has no visible highlighter menu,
+		// so expose the same entry point here). Calls the shared helper directly
+		// so both reader modes get identical behavior without the window bridge.
+		const clipHighlightsBtn = doc.createElement('button');
+		clipHighlightsBtn.className = 'obsidian-reader-settings-trigger nav-btn';
+		clipHighlightsBtn.setAttribute('aria-label', getMessage('clipHighlights'));
+		clipHighlightsBtn.appendChild(this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			paths: ['M4 4h6', 'M4 4v6', 'M20 20h-6', 'M20 20v-6', 'm14 4 6 6', 'm10 20-6-6'],
+		}));
+		clipHighlightsBtn.addEventListener('click', async (e) => {
+			e.stopPropagation();
+			clipDropdown.classList.remove('is-open');
+			settingsBar.classList.remove('is-open');
+			await localHighlighter.clipHighlightsToPopup();
+		});
+
 		// Clip button with dropdown
 		const clipButton = doc.createElement('button');
 		clipButton.className = 'obsidian-reader-settings-trigger nav-btn';
@@ -341,6 +358,7 @@ export class Reader {
 		triggerGroup.className = 'obsidian-reader-nav';
 		triggerGroup.appendChild(outlineBtn);
 		triggerGroup.appendChild(highlighterBtn);
+		triggerGroup.appendChild(clipHighlightsBtn);
 		triggerGroup.appendChild(clipButton);
 		triggerGroup.appendChild(trigger);
 		triggerGroup.appendChild(addToObsidianBtn);

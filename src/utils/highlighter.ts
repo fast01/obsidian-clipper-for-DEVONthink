@@ -10,6 +10,7 @@ import {
 	markHighlightJustCreated,
 } from './highlighter-overlays';
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
+import { getMessage } from './i18n';
 import dayjs from 'dayjs';
 import { generalSettings, loadSettings } from './storage-utils';
 import { normalizeUrl } from './url-utils';
@@ -334,8 +335,10 @@ function updateUndoRedoButtons() {
 	}
 }
 
-async function handleClipButtonClick(e: Event) {
-	e.preventDefault();
+// Shared by the highlighter menu's "Clip highlights" button and the reader
+// toolbar's equivalent button. Carries the one-shot intent so the popup renders
+// only the highlighted passages, regardless of the global highlightBehavior.
+export async function clipHighlightsToPopup(): Promise<void> {
 	const browserType = await detectBrowser();
 
 	try {
@@ -355,6 +358,11 @@ async function handleClipButtonClick(e: Event) {
 			console.error('Failed to open popup:', error);
 		}
 	}
+}
+
+async function handleClipButtonClick(e: Event) {
+	e.preventDefault();
+	await clipHighlightsToPopup();
 }
 
 export function createHighlighterMenu() {
@@ -378,7 +386,7 @@ export function createHighlighterMenu() {
 		const clipButton = document.createElement('button');
 		clipButton.id = 'obsidian-clip-button';
 		clipButton.className = 'mod-cta';
-		clipButton.textContent = 'Clip highlights';
+		clipButton.textContent = getMessage('clipHighlights');
 		menu.appendChild(clipButton);
 		
 		// Add clear highlights button

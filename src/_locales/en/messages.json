@@ -124,6 +124,9 @@
 			}
 		}
 	},
+	"clipHighlights": {
+		"message": "Clip highlights"
+	},
 	"clipboardError": {
 		"message": "Obsidian is not able to access your clipboard. Try the troubleshooting instructions here: $1",
 		"placeholders": {

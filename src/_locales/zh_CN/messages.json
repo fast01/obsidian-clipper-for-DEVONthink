@@ -124,6 +124,9 @@
 			}
 		}
 	},
+	"clipHighlights": {
+		"message": "剪切高亮内容"
+	},
 	"clipboardError": {
 		"message": "Obsidian 无法访问你的剪贴板。请尝试此处的故障排除说明：$1",
 		"placeholders": {
