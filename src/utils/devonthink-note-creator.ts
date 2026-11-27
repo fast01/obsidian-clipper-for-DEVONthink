@@ -39,9 +39,12 @@ export type DevonThinkFormat = 'markdown' | 'html';
 // Kept as a fragment (no <!DOCTYPE>/<html>) because that is the form verified
 // to work with createHTML + location in DT 4.4.2.
 function wrapHtmlForDevonThink(html: string): string {
-	return `<div style="background:#ffffff!important;color:#1a1a1a!important;padding:16px;` +
-		`font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;` +
-		`min-height:100%">${html}</div>`;
+	// A bare <div> only paints its own box: with short content (e.g. highlight-
+	// only clips) the area around it stays dark under DT's dark appearance.
+	// A <style> block applying to html/body paints the whole preview surface.
+	return `<style>html,body{background-color:#ffffff!important;color:#1a1a1a!important;margin:0;padding:16px}` +
+		`a{color:#0645ad}img{max-width:100%}</style>` +
+		`<div>${html}</div>`;
 }
 
 export async function saveToDevonThink(
